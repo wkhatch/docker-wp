@@ -1,0 +1,44 @@
+version: '3'
+services:
+   db:
+     image: mysql:5.7
+     ports:
+       - "3308:3306"
+     volumes:
+       - wp-data:/var/lib/mysql
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: password
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: password
+   memcached:
+    image: memcached       
+   wordpress:
+     depends_on:
+       - db
+       - memcached
+     build: .
+     ports:
+       - "80:80"
+     restart: always
+     volumes:
+       - ./wordpress/:/var/www/html
+       - ./wp-content/:/var/www/html/wp-content
+     environment:
+       WORDPRESS_DB_HOST: db
+       WORDPRESS_DB_NAME: wordpress
+       WORDPRESS_DB_USER: wordpress
+       WORDPRESS_DB_PASSWORD: password
+       WORDPRESS_TABLE_PREFIX: "wp_"
+       WORDPRESS_DEBUG: 1
+       AUTH_KEY: theauthkey
+       SECURE_AUTH_KEY: thesecureauthkey
+       LOGGED_IN_KEY: theloggedinkey
+       NONCE_KEY: thenoncekey
+       AUTH_SALT: theauthsalt
+       SECURE_AUTH_SALT: thesecureauthsalt
+       LOGGED_IN_SALT: theloggedinsalt
+       NONCE_SALT: thenoncesalt
+volumes:
+  wp-data: {}
